@@ -8,3 +8,7 @@
 soup.find_all(href=re.compile("elsie"), id='link1')
 ```
 + + + find_all可以取一个类的名称，两个不行
++ + + If you want to search for tags that match two or more CSS classes, you should use a CSS selector:
+```
+soup.select('div.tvgenre.clear')
+```
