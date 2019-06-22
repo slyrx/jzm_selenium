@@ -9,6 +9,7 @@
 ---
 + WebDriverWait是显性等待类
 + 表示找到元素前，等待10秒。如果是找到了该元素，页面还继续加载吗？
++ 没有找到重试5秒，找到了，则按照实际加载时间计，可能很长，也可能较长。
 + 使用方式
 ```
 from selenium.webdriver.support.ui import WebDriverWait
