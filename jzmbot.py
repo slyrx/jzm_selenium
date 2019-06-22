@@ -43,6 +43,8 @@ class juzimipy:
             return logger
 jzm = juzimipy()
 driver = webdriver.Chrome('./chromedriver')
+#driver.set_page_load_timeout(10)
+
 driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
 base_url = 'https://www.juzimi.com/'
 Tag = unquote("%E5%85%88%E7%A7%A6")
@@ -91,13 +93,16 @@ else:
                 jzm.loger.info("IndexError: list index out of range")
 
             one_author["page_" + str(k)] = one_author_sentencs
-            with codecs.open(author + "_page: " + str(j) + '.json', "a+", 'utf-8') as f:
+            with codecs.open(author + "_page: " + str(k) + '.json', "a+", 'utf-8') as f:
                 json.dump(one_author_sentencs, f, ensure_ascii=False)
 
         def get_url(url):
-            driver.get(url)
-            html = driver.page_source
-            sub_soup = BeautifulSoup(html, "html.parser")
+            try:
+                driver.get(url)
+                sub_soup = BeautifulSoup(driver.page_source, "html.parser")
+            except TimeoutError:
+                driver.execute_script('window.stop()')
+                sub_soup = BeautifulSoup(driver.page_source, "html.parser")
 
             return sub_soup
         # one author info page
@@ -123,11 +128,10 @@ else:
             #next page
             for j in range(1, int(sub_soup.find("li", class_="pager-last").text)):
                 next_page_url = url + "?page=" + str(j)
-                driver.get(next_page_url)
+                sub_soup = get_url(next_page_url)
                 interval_2 = random.choice(range(20))
                 jzm.loger.info("2 随机数为:{},{}".format(interval_2,"page: " + str(j)))
                 time.sleep(interval_2)
-                sub_soup = BeautifulSoup(driver.page_source, "html.parser")
                 get_all_sentences_by_one_author(sub_soup, unquote(people_in_one_tag[i].split("/")[2]), j)
 
             with codecs.open(author + '.json', "a+", 'utf-8') as f:
