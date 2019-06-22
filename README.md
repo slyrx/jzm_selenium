@@ -18,6 +18,9 @@ soup.select('div.tvgenre.clear')
 while True:
     retry
 ```
++ 同一个IP连续登陆157页及以上会被封IP
++ + 解决办法：每一百多页换一个IP
+
 2. [如何做增量处理](https://github.com/slyrx/jzm_selenium/blob/master/breakpoint_continue_to_crawl.md)
 + + 通过制定命名规则的方式，在程序开启时检查上一次爬取的位置，从而调整爬取队列中链接的开始顺序。
 
