@@ -9,6 +9,10 @@ import json
 from urllib.parse import quote, unquote, urlencode
 import codecs
 import random
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from datetime import datetime
 
 
 class juzimipy:
@@ -43,9 +47,15 @@ class juzimipy:
             return logger
 jzm = juzimipy()
 driver = webdriver.Chrome('./chromedriver')
-#driver.set_page_load_timeout(10)
+try:
+    driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
+    jzm.loger.info("first datetime: {}".format(datetime.now()))
+    locator = (By.CLASS_NAME, 'contentin')
+    WebDriverWait(driver, 5, 0.5).until(EC.presence_of_element_located(locator))
+except:
+    jzm.loger.info("TimeOutException")
+    driver.quit()
 
-driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
 base_url = 'https://www.juzimi.com/'
 Tag = unquote("%E5%85%88%E7%A7%A6")
 
@@ -98,21 +108,25 @@ else:
 
         def get_url(url):
             try:
+                jzm.loger.info("get datetime: {}".format(datetime.now()))
                 driver.get(url)
+                locator = (By.CLASS_NAME, 'view-content')
+                WebDriverWait(driver, 5, 0.5).until(EC.presence_of_element_located(locator))
+                jzm.loger.info("get datetime: {}".format(datetime.now()))
                 sub_soup = BeautifulSoup(driver.page_source, "html.parser")
-            except TimeoutError:
-                driver.execute_script('window.stop()')
-                sub_soup = BeautifulSoup(driver.page_source, "html.parser")
+            except:
+                jzm.loger.info("TimeExecption")
+                driver.quit()
 
             return sub_soup
         # one author info page
         for i in range(2,len(people_in_one_tag)):
+            author = unquote(people_in_one_tag[i].split("/")[2])
+            jzm.loger.info("{},{}".format(i,author))
             url = base_url + people_in_one_tag[i]
             sub_soup = get_url(url)
 
-            author = unquote(people_in_one_tag[i].split("/")[2])
-            jzm.loger.info("{},{}".format(i,author))
-            interval_1 = random.choice(range(15))
+            interval_1 = random.choice(range(5))
             jzm.loger.info("1 随机数为:{}".format(interval_1))
             time.sleep(interval_1)
             one_author = {}
@@ -129,7 +143,7 @@ else:
             for j in range(1, int(sub_soup.find("li", class_="pager-last").text)):
                 next_page_url = url + "?page=" + str(j)
                 sub_soup = get_url(next_page_url)
-                interval_2 = random.choice(range(20))
+                interval_2 = random.choice(range(10))
                 jzm.loger.info("2 随机数为:{},{}".format(interval_2,"page: " + str(j)))
                 time.sleep(interval_2)
                 get_all_sentences_by_one_author(sub_soup, unquote(people_in_one_tag[i].split("/")[2]), j)
