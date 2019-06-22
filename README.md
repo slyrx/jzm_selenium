@@ -23,3 +23,5 @@ while True:
 3. 控件加载时间过长，selenium.common.exceptions.TimeoutException: Message: timeout
 + + 单个网页的内容在浏览器中以及可以看到，但是在selenium里却一直显示在加载。
 + + 解决方法：如果超过10s还没有加载完，就不加载了
++ + by
++ + WebDriverWait
