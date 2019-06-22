@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 WebDriverWait(driver, 超时时长(单位为秒), 调用频率(单位为秒), 忽略异常).until(可执行方法, 超时时返回的信息)
 ```
 + Tips发现：设置10s时，并不是整10s停止，有时候会是十几秒，但不会出现小于10s的情况。
++ + 因为链路阻塞，执行get函数时本身这个函数的执行时间已经是1分甚至几分种了，因此即使是第一次成功的返回就已经远远超于5秒的设定。
 + 疑问
 + + 对象一定有 __call__() 方法 是什么意思？
 + + 回答：指传入的要是一个函数指针，因为在until内部需要调用该函数指针进行执行method(self.\_driver)
