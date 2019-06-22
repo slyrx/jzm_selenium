@@ -60,6 +60,7 @@ driver.close()
 
 2. 停止加载的几种方法
 + 通过Python 针对浏览器控件按下ESC中断浏览器加载
++ + 需要引入多线程，chain、send_key
 + 通过设置限定页面加载限制时间
 + + window.stop()方法，是在接收到timeoutErr后，才调用执行的方法，timeoutErr是触发器。在一次get过程中不会影响到get当次的执行。
 + 通过插件解决
