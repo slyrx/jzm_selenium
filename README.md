@@ -18,7 +18,7 @@ soup.select('div.tvgenre.clear')
 while True:
     retry
 ```
-2. 如何做增量处理
+2. [如何做增量处理](https://github.com/slyrx/jzm_selenium/blob/master/breakpoint_continue_to_crawl.md)
 + + 通过制定命名规则的方式，在程序开启时检查上一次爬取的位置，从而调整爬取队列中链接的开始顺序。
 
 3. [控件加载时间过长，selenium.common.exceptions.TimeoutException: Message: timeout](https://github.com/slyrx/jzm_selenium/blob/master/loading_time_too_long.md)
