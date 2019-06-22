@@ -14,6 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 WebDriverWait(driver, 超时时长(单位为秒), 调用频率(单位为秒), 忽略异常).until(可执行方法, 超时时返回的信息)
 ```
++ Tips发现：设置10s时，并不是整10s停止，有时候会是十几秒，但不会出现小于10s的情况。
 + 疑问
 + + 对象一定有 __call__() 方法 是什么意思？
 
