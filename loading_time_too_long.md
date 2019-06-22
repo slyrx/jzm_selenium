@@ -56,3 +56,10 @@ driver = webdriver.Chrome(chrome_options=chrome_options)
 driver.get("http://www.baidu.com")
 driver.close()
 ```
+
+2. 停止加载的几种方法
++ 通过Python win32api键按下ESC中断浏览器加载
++ 通过设置限定页面加载限制时间
++ 通过插件解决
++ + 要给浏览器安装Adblock-Plus拦截广告插件
++ + 网页在主内容完整却依然加载不完整的一个原因是带有广告页面，广告内容加载不完全导致显示加载未完成，因此去掉广告即可。
