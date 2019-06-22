@@ -12,4 +12,4 @@ soup.find_all(href=re.compile("elsie"), id='link1')
 ```
 soup.select('div.tvgenre.clear')
 ```
-+ + 某一页长时间加载不上，TimeOut显示。解决办法
++ + 某一页长时间加载不上，TimeOut显示。解决办法:增加重试机制
