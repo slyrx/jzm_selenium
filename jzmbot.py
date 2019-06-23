@@ -14,10 +14,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from datetime import datetime
 import redis
+import test_proxy
 
 
 chop = webdriver.ChromeOptions()
 chop.add_extension('Adblock-Plus-free-ad-blocker_v3.5.2.crx')
+#chop.add_argument('--headless')
+chop.add_argument("--start-maximized")
+chop.add_extension(test_proxy.proxy_auth_plugin_path)
 
 class juzimipy:
     def __init__(self):
@@ -52,6 +56,7 @@ class juzimipy:
 jzm = juzimipy()
 client = redis.StrictRedis()
 driver = webdriver.Chrome('./chromedriver', chrome_options=chop)
+driver.implicitly_wait(7)
 try:
     driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
     jzm.loger.info("first datetime: {}".format(datetime.now()))
@@ -104,9 +109,9 @@ else:
                         "comment": comment if comment else "None",
                         "enterer": enterer if enterer else "None",
                     }
-                    jzm.loger.info("crawl {}".format(author + "_page_" + str(k) + str(q)))
+                    jzm.loger.info("crawl {}".format(author + "_page_" + str(k) +"_"+ str(q)))
+                    one_author_sentencs[author + "_page_" + str(k) +"_"+ str(q)] = str(sentence_json)
                     q += 1
-                    one_author_sentencs[author + "_page_" + str(k) + str(q)] = str(sentence_json)
 
                 jzm.loger.info("wg {}".format(author + "_page_" + str(k)))
                 client.hmset(author + "_page_" + str(k), one_author_sentencs)
@@ -114,6 +119,7 @@ else:
                 jzm.loger.info("IndexError: list index out of range")
 
         def get_url(url):
+            sub_soup = None
             try:
                 jzm.loger.info("get datetime: {}".format(datetime.now()))
                 driver.get(url)
@@ -127,7 +133,7 @@ else:
 
             return sub_soup
         # one author info page
-        for i in range(1,3):
+        for i in range(1,4):
             author = unquote(people_in_one_tag[i].split("/")[2])
             jzm.loger.info("{},{}".format(i,author))
             url = base_url + people_in_one_tag[i]
@@ -135,7 +141,7 @@ else:
 
             interval_1 = random.choice(range(5))
             jzm.loger.info("1 随机数为:{}".format(interval_1))
-            time.sleep(interval_1)
+            #time.sleep(interval_1)
 
 
             while True:
@@ -150,9 +156,9 @@ else:
             for j in range(1, int(sub_soup.find("li", class_="pager-last").text)):
                 interval_2 = random.choice(range(10))
                 jzm.loger.info("2 随机数为:{},{}".format(interval_2,"page: " + str(j)))
-                time.sleep(interval_2)
                 if client.exists(author + "_page_" + str(j)):
                     continue
+                #time.sleep(interval_2)
                 next_page_url = url + "?page=" + str(j)
                 sub_soup = get_url(next_page_url)
                 get_all_sentences_by_one_author(sub_soup, author, j)
