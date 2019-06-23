@@ -9,6 +9,7 @@
 ---
 + WebDriverWait是显性等待类
 + 表示找到元素前，等待10秒。如果是找到了该元素，页面还继续加载吗？
++ 没有找到重试5秒，找到了，则按照实际加载时间计，可能很长，也可能较长。
 + 使用方式
 ```
 from selenium.webdriver.support.ui import WebDriverWait
@@ -21,6 +22,7 @@ WebDriverWait(driver, 超时时长(单位为秒), 调用频率(单位为秒), �
 + + 对象一定有 __call__() 方法 是什么意思？
 + + 回答：指传入的要是一个函数指针，因为在until内部需要调用该函数指针进行执行method(self.\_driver)
 + 返回的内容根据**可执行方法**的结果返回对应的结果
++ 如果一次成功就不会在while True里循环了，如果一直找不到就会开始循环。
 
 ##### 什么是expected_conditions？如何使用？
 ---
@@ -55,3 +57,12 @@ driver = webdriver.Chrome(chrome_options=chrome_options)
 driver.get("http://www.baidu.com")
 driver.close()
 ```
+
+2. 停止加载的几种方法
++ 通过Python 针对浏览器控件按下ESC中断浏览器加载
++ + 需要引入多线程，chain、send_key
++ 通过设置限定页面加载限制时间
++ + window.stop()方法，是在接收到timeoutErr后，才调用执行的方法，timeoutErr是触发器。在一次get过程中不会影响到get当次的执行。
++ 通过插件解决
++ + 要给浏览器安装Adblock-Plus拦截广告插件
++ + 网页在主内容完整却依然加载不完整的一个原因是带有广告页面，广告内容加载不完全导致显示加载未完成，因此去掉广告即可。
