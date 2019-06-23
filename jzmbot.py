@@ -15,6 +15,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from datetime import datetime
 import redis
 import test_proxy
+import os
 
 
 chop = webdriver.ChromeOptions()
@@ -82,7 +83,11 @@ else:
             page_count_list.append(one.find("a")["href"])
 
         for one in soup.find_all("div", class_="view-content")[0].find_all('div', class_="views-row"):
-            people_in_one_tag.append(one.find('a')['href'])
+            one_author_stat = {
+                "href": one.find('a')['href'],
+                "s_count": int(one.find("a", class_="xqagepawirdesclink").text.split("个")[0])
+            }
+            people_in_one_tag.append(one_author_stat)
     except IndexError:
         print("IndexError: list index out of range")
     else:
@@ -130,37 +135,29 @@ else:
             except:
                 jzm.loger.info("TimeExecption")
                 driver.quit()
+                os.system("python3.6 jzmbot.py")
+
 
             return sub_soup
+
         # one author info page
-        for i in range(1,4):
-            author = unquote(people_in_one_tag[i].split("/")[2])
+        for i in range(len(people_in_one_tag)):
+            author = unquote(people_in_one_tag[i]["href"].split("/")[2])
             jzm.loger.info("{},{}".format(i,author))
-            url = base_url + people_in_one_tag[i]
-            sub_soup = get_url(url)
-
-            interval_1 = random.choice(range(5))
-            jzm.loger.info("1 随机数为:{}".format(interval_1))
-            #time.sleep(interval_1)
-
-
-            while True:
-                if "无法访问此网站" not in sub_soup.text:
-                    break
-                else:
-                    sub_soup = get_url(url)
-
-            get_all_sentences_by_one_author(sub_soup, author, 0)
+            url = base_url + people_in_one_tag[i]["href"]
 
             #next page
-            for j in range(1, int(sub_soup.find("li", class_="pager-last").text)):
-                interval_2 = random.choice(range(10))
-                jzm.loger.info("2 随机数为:{},{}".format(interval_2,"page: " + str(j)))
+            for j in range(0, people_in_one_tag[i]["s_count"] // 10 + 1):
                 if client.exists(author + "_page_" + str(j)):
                     continue
-                #time.sleep(interval_2)
                 next_page_url = url + "?page=" + str(j)
                 sub_soup = get_url(next_page_url)
+                while True:
+                    if "无法访问此网站" not in sub_soup.text:
+                        break
+                    else:
+                        sub_soup = get_url(next_page_url)
+
                 get_all_sentences_by_one_author(sub_soup, author, j)
 
 driver.quit()
