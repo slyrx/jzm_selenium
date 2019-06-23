@@ -19,10 +19,10 @@ import os
 
 
 chop = webdriver.ChromeOptions()
-chop.add_extension('Adblock-Plus-free-ad-blocker_v3.5.2.crx')
-#chop.add_argument('--headless')
+#chop.add_extension('Adblock-Plus-free-ad-blocker_v3.5.2.crx')
+chop.add_argument('--headless')
 chop.add_argument("--start-maximized")
-chop.add_extension(test_proxy.proxy_auth_plugin_path)
+#chop.add_extension(test_proxy.proxy_auth_plugin_path)
 
 class juzimipy:
     def __init__(self):
@@ -59,7 +59,8 @@ client = redis.StrictRedis()
 driver = webdriver.Chrome('./chromedriver', chrome_options=chop)
 driver.implicitly_wait(7)
 try:
-    driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
+    #driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
+    driver.get("https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6?page=2")
     jzm.loger.info("first datetime: {}".format(datetime.now()))
     locator = (By.CLASS_NAME, 'contentin')
     WebDriverWait(driver, 5, 0.5).until(EC.presence_of_element_located(locator))
@@ -139,6 +140,7 @@ else:
 
 
             return sub_soup
+
 
         # one author info page
         for i in range(len(people_in_one_tag)):
