@@ -2,18 +2,18 @@ from selenium import webdriver
 import string
 import zipfile
 
-proxyHost = "http-pro.abuyun.com"
-proxyPort = "9010"
+proxyHost = "http-dyn.abuyun.com"
+proxyPort = "9020"
 
-proxyUser = "H01234567890123P"
-proxyPass = "0123456789012345"
+proxyUser = "HEO66RR3466D2VJD"
+proxyPass = "B22F224810D28148"
 
 
 def create_proxy_auth_extension(proxy_host, proxy_port,
                                 proxy_username, proxy_password,
                                 scheme='http', plugin_path=None):
     if plugin_path is None:
-        plugin_path = r'D:/{}_{}@http-pro.abuyun.com_9010.zip'.format(proxy_username, proxy_password)
+        plugin_path = r'/Users/slyrx/{}_{}@http-pro.abuyun.com_9010.zip'.format(proxy_username, proxy_password)
 
     manifest_json = """
     {
@@ -88,11 +88,11 @@ proxy_auth_plugin_path = create_proxy_auth_extension(
     proxy_username=proxyUser,
     proxy_password=proxyPass)
 
-option = webdriver.ChromeOptions()
+#option = webdriver.ChromeOptions()
 
-option.add_argument("--start-maximized")
-option.add_extension(proxy_auth_plugin_path)
+#option.add_argument("--start-maximized")
+#option.add_extension(proxy_auth_plugin_path)
 
-driver = webdriver.Chrome(chrome_options=option)
+#driver = webdriver.Chrome(chrome_options=option)
 
-driver.get("http://test.abuyun.com")
+#driver.get("http://test.abuyun.com")
