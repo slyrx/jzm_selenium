@@ -13,7 +13,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from datetime import datetime
+import redis
 
+
+chop = webdriver.ChromeOptions()
+chop.add_extension('Adblock-Plus-free-ad-blocker_v3.5.2.crx')
 
 class juzimipy:
     def __init__(self):
@@ -46,7 +50,8 @@ class juzimipy:
 
             return logger
 jzm = juzimipy()
-driver = webdriver.Chrome('./chromedriver')
+client = redis.StrictRedis()
+driver = webdriver.Chrome('./chromedriver', chrome_options=chop)
 try:
     driver.get('https://www.juzimi.com/dynasty/%E5%85%88%E7%A7%A6')
     jzm.loger.info("first datetime: {}".format(datetime.now()))
@@ -81,8 +86,9 @@ else:
 
 
         def get_all_sentences_by_one_author(soup, author, k):
-            one_author_sentencs = []
+            one_author_sentencs = {}
             try:
+                q = 0
                 for one in soup.select('div.view.view-xqfamoustermspage')[0].find_all('div', class_="views-row"):
                     content = one.find('div', class_="views-field-phpcode-1").text
                     from_book = one.find('div', class_="xqjulistwafo").text if one.find('div',
@@ -92,19 +98,20 @@ else:
                     enterer = one.find('div', class_="views-field-name").text
 
                     sentence_json = {
-                        "content": content,
-                        "from_book": from_book,
-                        "like": like,
-                        "comment": comment,
-                        "enterer": enterer,
+                        "content": content if content else "None",
+                        "from_book": from_book if from_book else "None",
+                        "like": like if like else "None",
+                        "comment": comment if comment else "None",
+                        "enterer": enterer if enterer else "None",
                     }
-                    one_author_sentencs.append(sentence_json)
+                    jzm.loger.info("crawl {}".format(author + "_page_" + str(k) + str(q)))
+                    q += 1
+                    one_author_sentencs[author + "_page_" + str(k) + str(q)] = str(sentence_json)
+
+                jzm.loger.info("wg {}".format(author + "_page_" + str(k)))
+                client.hmset(author + "_page_" + str(k), one_author_sentencs)
             except IndexError:
                 jzm.loger.info("IndexError: list index out of range")
-
-            one_author["page_" + str(k)] = one_author_sentencs
-            with codecs.open(author + "_page: " + str(k) + '.json', "a+", 'utf-8') as f:
-                json.dump(one_author_sentencs, f, ensure_ascii=False)
 
         def get_url(url):
             try:
@@ -120,7 +127,7 @@ else:
 
             return sub_soup
         # one author info page
-        for i in range(2,len(people_in_one_tag)):
+        for i in range(1,3):
             author = unquote(people_in_one_tag[i].split("/")[2])
             jzm.loger.info("{},{}".format(i,author))
             url = base_url + people_in_one_tag[i]
@@ -129,7 +136,6 @@ else:
             interval_1 = random.choice(range(5))
             jzm.loger.info("1 随机数为:{}".format(interval_1))
             time.sleep(interval_1)
-            one_author = {}
 
 
             while True:
@@ -137,17 +143,18 @@ else:
                     break
                 else:
                     sub_soup = get_url(url)
+
             get_all_sentences_by_one_author(sub_soup, author, 0)
 
             #next page
             for j in range(1, int(sub_soup.find("li", class_="pager-last").text)):
-                next_page_url = url + "?page=" + str(j)
-                sub_soup = get_url(next_page_url)
                 interval_2 = random.choice(range(10))
                 jzm.loger.info("2 随机数为:{},{}".format(interval_2,"page: " + str(j)))
                 time.sleep(interval_2)
-                get_all_sentences_by_one_author(sub_soup, unquote(people_in_one_tag[i].split("/")[2]), j)
+                if client.exists(author + "_page_" + str(j)):
+                    continue
+                next_page_url = url + "?page=" + str(j)
+                sub_soup = get_url(next_page_url)
+                get_all_sentences_by_one_author(sub_soup, author, j)
 
-            with codecs.open(author + '.json', "a+", 'utf-8') as f:
-                json.dump(one_author, f, ensure_ascii=False)
 driver.quit()
